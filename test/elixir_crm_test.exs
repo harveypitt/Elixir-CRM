@@ -1,8 +1,8 @@
 defmodule ElixirCrmTest do
   use ExUnit.Case
-  doctest ElixirCrm
+  doctest ElixirCRM
 
   test "greets the world" do
-    assert ElixirCrm.hello() == :world
+    assert ElixirCRM.hello() == :world
   end
 end
