@@ -14,5 +14,6 @@ defmodule ElixirCRM do
     IO.puts(:success)
     current_time = DateTime.utc_now()
     IO.puts(current_time)
+    :success
   end
 end
