@@ -1,0 +1,13 @@
+<div class="p-8">
+  <h1 class="text-3xl font-bold mb-8">Users Page</h1>
+  <ul class="space-y-4">
+    <%= for user <- @users do %>
+      <li class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-200">
+        <div class="flex flex-col space-y-2">
+          <span class="text-xl font-medium text-gray-900"><%= user.name %></span>
+          <span class="text-gray-600"><%= user.email %></span>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+</div>

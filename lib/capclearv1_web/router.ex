@@ -18,6 +18,12 @@ defmodule Capclearv1Web.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+    get "/users", PageController, :users
+  end
+
+  scope "/api", Capclearv1Web do
+    pipe_through :api
+    resources "/contacts", ContactController, except: [:new, :edit]
   end
 
   # Other scopes may use custom stacks.
