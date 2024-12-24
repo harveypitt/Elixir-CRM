@@ -19,7 +19,8 @@ defmodule Capclearv1Web.ContactJSON do
     %{
       id: contact.id,
       name: contact.name,
-      email: contact.email
+      email: contact.email,
+      user_id: contact.user_id
     }
   end
 end

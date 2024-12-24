@@ -5,7 +5,7 @@ defmodule Capclearv1.Accounts.User do
   schema "users" do
     field :name, :string
     field :email, :string
-
+    has_many :contacts, Capclearv1.Contacts.Contact
     timestamps(type: :utc_datetime)
   end
 

@@ -1,5 +1,6 @@
 defmodule Capclearv1Web.UserJSON do
   alias Capclearv1.Accounts.User
+  alias Capclearv1.Contacts.Contact
 
   @doc """
   Renders a list of users.
@@ -19,7 +20,16 @@ defmodule Capclearv1Web.UserJSON do
     %{
       id: user.id,
       name: user.name,
-      email: user.email
+      email: user.email,
+      contacts: for(contact <- user.contacts, do: contacts_data(contact))
+    }
+  end
+
+  defp contacts_data(%Contact{} = contact) do
+    %{
+      id: contact.id,
+      name: contact.name,
+      email: contact.email
     }
   end
 end
