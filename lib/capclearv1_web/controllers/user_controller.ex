@@ -3,11 +3,12 @@ defmodule Capclearv1Web.UserController do
 
   alias Capclearv1.Accounts
   alias Capclearv1.Accounts.User
+  alias Capclearv1.Repo
 
   action_fallback Capclearv1Web.FallbackController
 
   def index(conn, _params) do
-    users = Accounts.list_users()
+    users = Accounts.list_users() |> Repo.preload(:contacts)
     render(conn, :index, users: users)
   end
 
