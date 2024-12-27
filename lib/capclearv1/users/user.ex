@@ -1,4 +1,4 @@
-defmodule Capclearv1.Accounts.User do
+defmodule Capclearv1.Users.User do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -7,11 +7,10 @@ defmodule Capclearv1.Accounts.User do
     field :last_name, :string
     field :gender, :string
     field :phone, :string
-    field :type, :string
+    field :type, Ecto.Enum, values: [:dietitian, :patient, :admin]
 
     belongs_to :account, Capclearv1.Accounts.Account
     has_many :contacts, Capclearv1.Contacts.Contact
-    # We'll add chat_thread association later when we implement that part
 
     timestamps(type: :utc_datetime)
   end

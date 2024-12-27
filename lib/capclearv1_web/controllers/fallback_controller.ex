@@ -14,7 +14,15 @@ defmodule Capclearv1Web.FallbackController do
     |> render(:error, changeset: changeset)
   end
 
-  # This clause is an example of how to handle resources that cannot be found.
+  # This clause handles errors from Ecto.Multi operations
+  def call(conn, {:error, _failed_operation, %Ecto.Changeset{} = changeset, _changes_so_far}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> put_view(json: Capclearv1Web.ChangesetJSON)
+    |> render(:error, changeset: changeset)
+  end
+
+  # This clause is called for all other errors.
   def call(conn, {:error, :not_found}) do
     conn
     |> put_status(:not_found)

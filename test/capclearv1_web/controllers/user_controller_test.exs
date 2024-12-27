@@ -3,17 +3,27 @@ defmodule Capclearv1Web.UserControllerTest do
 
   import Capclearv1.AccountsFixtures
 
-  alias Capclearv1.Accounts.User
+  alias Capclearv1.Users.User
 
   @create_attrs %{
-    name: "some name",
-    email: "some email"
+    "first_name" => "John",
+    "last_name" => "Doe",
+    "gender" => "male",
+    "phone" => "1234567890",
+    "type" => "dietitian",
+    "email" => "john.doe@example.com"
   }
   @update_attrs %{
-    name: "some updated name",
-    email: "some updated email"
+    "first_name" => "Jane",
+    "last_name" => "Smith",
+    "phone" => "0987654321"
   }
-  @invalid_attrs %{name: nil, email: nil}
+  @invalid_attrs %{
+    "first_name" => nil,
+    "last_name" => nil,
+    "type" => nil,
+    "email" => nil
+  }
 
   setup %{conn: conn} do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
@@ -23,6 +33,13 @@ defmodule Capclearv1Web.UserControllerTest do
     test "lists all users", %{conn: conn} do
       conn = get(conn, ~p"/api/users")
       assert json_response(conn, 200)["data"] == []
+    end
+
+    test "lists users with their accounts preloaded", %{conn: conn} do
+      user = user_fixture()
+      conn = get(conn, ~p"/api/users")
+      assert [response] = json_response(conn, 200)["data"]
+      assert response["email"] == user.account.email
     end
   end
 
@@ -35,14 +52,39 @@ defmodule Capclearv1Web.UserControllerTest do
 
       assert %{
                "id" => ^id,
-               "email" => "some email",
-               "name" => "some name"
+               "first_name" => "John",
+               "last_name" => "Doe",
+               "gender" => "male",
+               "phone" => "1234567890",
+               "type" => "dietitian",
+               "email" => "john.doe@example.com"
              } = json_response(conn, 200)["data"]
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
       conn = post(conn, ~p"/api/users", user: @invalid_attrs)
       assert json_response(conn, 422)["errors"] != %{}
+    end
+
+    test "renders errors when email format is invalid", %{conn: conn} do
+      attrs = Map.put(@create_attrs, "email", "invalid-email")
+      conn = post(conn, ~p"/api/users", user: attrs)
+      assert json_response(conn, 422)["errors"]["email"]
+    end
+
+    test "renders errors when email is already taken", %{conn: conn} do
+      # Create first user
+      post(conn, ~p"/api/users", user: @create_attrs)
+
+      # Try to create second user with same email
+      conn = post(conn, ~p"/api/users", user: @create_attrs)
+      assert json_response(conn, 422)["errors"]["email"]
+    end
+
+    test "renders errors when type is invalid", %{conn: conn} do
+      attrs = Map.put(@create_attrs, "type", "invalid_type")
+      conn = post(conn, ~p"/api/users", user: attrs)
+      assert json_response(conn, 422)["errors"]["type"]
     end
   end
 
@@ -57,14 +99,28 @@ defmodule Capclearv1Web.UserControllerTest do
 
       assert %{
                "id" => ^id,
-               "email" => "some updated email",
-               "name" => "some updated name"
+               "first_name" => "Jane",
+               "last_name" => "Smith",
+               "phone" => "0987654321"
              } = json_response(conn, 200)["data"]
     end
 
     test "renders errors when data is invalid", %{conn: conn, user: user} do
       conn = put(conn, ~p"/api/users/#{user}", user: @invalid_attrs)
       assert json_response(conn, 422)["errors"] != %{}
+    end
+
+    test "renders errors when partial data is invalid", %{conn: conn, user: user} do
+      conn = put(conn, ~p"/api/users/#{user}", user: %{"first_name" => ""})
+      assert json_response(conn, 422)["errors"]["first_name"]
+    end
+
+    test "preserves existing data when updating partial fields", %{conn: conn, user: user} do
+      conn = put(conn, ~p"/api/users/#{user}", user: %{"phone" => "9999999999"})
+      assert response = json_response(conn, 200)["data"]
+      assert response["first_name"] == user.first_name
+      assert response["last_name"] == user.last_name
+      assert response["phone"] == "9999999999"
     end
   end
 
@@ -79,10 +135,27 @@ defmodule Capclearv1Web.UserControllerTest do
         get(conn, ~p"/api/users/#{user}")
       end
     end
+
+    test "returns 404 when user doesn't exist", %{conn: conn} do
+      assert_error_sent 404, fn ->
+        delete(conn, ~p"/api/users/9999999")
+      end
+    end
   end
 
   defp create_user(_) do
     user = user_fixture()
     %{user: user}
+  end
+
+  def valid_user_attributes(attrs \\ %{}) do
+    attrs = Enum.into(attrs, %{
+      "first_name" => "John",
+      "last_name" => "Doe",
+      "gender" => "male",
+      "phone" => "1234567890",
+      "type" => "dietitian",
+      "email" => unique_user_email()
+    })
   end
 end

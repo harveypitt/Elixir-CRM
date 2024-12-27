@@ -6,8 +6,8 @@ import Config
 # to provide built-in test partitioning in CI environment.
 # Run `mix help test` for more information.
 config :capclearv1, Capclearv1.Repo,
-  username: "postgres",
-  password: "postgres",
+  username: "harveypitt",
+  password: "learnelixir",
   hostname: "localhost",
   database: "capclearv1_test#{System.get_env("MIX_TEST_PARTITION")}",
   pool: Ecto.Adapters.SQL.Sandbox,

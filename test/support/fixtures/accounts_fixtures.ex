@@ -4,22 +4,27 @@ defmodule Capclearv1.AccountsFixtures do
   entities via the `Capclearv1.Accounts` context.
   """
 
-  @doc """
-  Generate a unique user email.
-  """
-  def unique_user_email, do: "some email#{System.unique_integer([:positive])}"
+  def unique_user_email, do: "user#{System.unique_integer()}@example.com"
 
-  @doc """
-  Generate a user.
-  """
+  def valid_user_attributes(attrs \\ %{}) do
+    Enum.into(attrs, %{
+      "first_name" => "John",
+      "last_name" => "Doe",
+      "gender" => "male",
+      "phone" => "1234567890",
+      "type" => "dietitian",
+      "email" => unique_user_email()
+    })
+  end
+
   def user_fixture(attrs \\ %{}) do
-    {:ok, user} =
-      attrs
-      |> Enum.into(%{
-        email: unique_user_email(),
-        name: "some name"
-      })
-      |> Capclearv1.Accounts.create_user()
+    attrs = valid_user_attributes(attrs)
+
+    {:ok, %{user: user}} =
+      Capclearv1.Users.create_user_with_account(
+        Map.drop(attrs, ["email"]),
+        %{"email" => attrs["email"], "hashed_password" => "somehashedpassword"}
+      )
 
     user
   end
