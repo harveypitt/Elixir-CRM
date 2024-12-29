@@ -17,12 +17,12 @@ defmodule Capclearv1Web.ContactJSON do
 
   defp data(%Contact{} = contact) do
     %{
-      id: contact.id,
+      contact_id: contact.id,
       first_name: contact.first_name,
       last_name: contact.last_name,
       email: contact.email,
       phone: contact.phone,
-      user_id: contact.user_id
+      dietitian_id: contact.user_id
     }
   end
 end
