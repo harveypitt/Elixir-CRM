@@ -15,6 +15,8 @@ defmodule Capclearv1Web.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug :fetch_session
+    plug :fetch_flash
   end
 
   # Public routes
@@ -42,8 +44,11 @@ defmodule Capclearv1Web.Router do
 
   scope "/api", Capclearv1Web do
     pipe_through :api
+
     resources "/contacts", ContactController, except: [:new, :edit]
-    resources "/users", UserController, except: [:new, :edit]
+    resources "/users", UserController, except: [:new, :edit] do
+      get "/contacts", UserController, :list_contacts
+    end
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development

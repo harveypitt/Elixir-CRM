@@ -11,8 +11,10 @@ defmodule Capclearv1.ContactsFixtures do
     {:ok, contact} =
       attrs
       |> Enum.into(%{
-        email: "some email",
-        name: "some name"
+        first_name: "some first name",
+        last_name: "some last name",
+        email: "some@email.com",
+        phone: "1234567890"
       })
       |> Capclearv1.Contacts.create_contact()
 

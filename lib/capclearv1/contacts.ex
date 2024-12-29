@@ -22,6 +22,21 @@ defmodule Capclearv1.Contacts do
   end
 
   @doc """
+  Returns the list of contacts for a specific user (dietitian).
+
+  ## Examples
+
+      iex> list_contacts_by_user_id(123)
+      [%Contact{}, ...]
+
+  """
+  def list_contacts_by_user_id(user_id) do
+    Contact
+    |> where([c], c.user_id == ^user_id)
+    |> Repo.all()
+  end
+
+  @doc """
   Gets a single contact.
 
   Raises `Ecto.NoResultsError` if the Contact does not exist.

@@ -3,6 +3,7 @@ defmodule Capclearv1Web.UserController do
 
   alias Capclearv1.Users
   alias Capclearv1.Users.User
+  alias Capclearv1.Contacts
 
   action_fallback Capclearv1Web.FallbackController
 
@@ -44,6 +45,22 @@ defmodule Capclearv1Web.UserController do
 
     with {:ok, %User{}} <- Users.delete_user(user) do
       send_resp(conn, :no_content, "")
+    end
+  end
+
+  def list_contacts(conn, %{"user_id" => id}) do
+    user = Users.get_user!(id)
+
+    case user.type do
+      :dietitian ->
+        contacts = Contacts.list_contacts_by_user_id(id)
+        conn
+        |> put_view(Capclearv1Web.ContactJSON)
+        |> render(:index, contacts: contacts)
+      _ ->
+        conn
+        |> put_status(:forbidden)
+        |> json(%{error: "Only dietitians can have contacts"})
     end
   end
 end
