@@ -1,6 +1,8 @@
 defmodule Capclearv1Web.Router do
   use Capclearv1Web, :router
 
+  import Capclearv1Web.UserAuth
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -8,16 +10,34 @@ defmodule Capclearv1Web.Router do
     plug :put_root_layout, html: {Capclearv1Web.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug :fetch_current_account
   end
 
   pipeline :api do
     plug :accepts, ["json"]
   end
 
+  # Public routes
   scope "/", Capclearv1Web do
     pipe_through :browser
 
     get "/", PageController, :home
+  end
+
+  # Authentication routes
+  scope "/", Capclearv1Web do
+    pipe_through [:browser, :redirect_if_user_is_authenticated]
+
+    live "/login", AuthLive.Login, :login
+    live "/register", AuthLive.Register, :register
+    post "/login", UserSessionController, :create
+  end
+
+  # Protected routes
+  scope "/", Capclearv1Web do
+    pipe_through [:browser, :require_authenticated_user]
+
+    delete "/logout", UserSessionController, :delete
   end
 
   scope "/api", Capclearv1Web do
@@ -25,11 +45,6 @@ defmodule Capclearv1Web.Router do
     resources "/contacts", ContactController, except: [:new, :edit]
     resources "/users", UserController, except: [:new, :edit]
   end
-
-  # Other scopes may use custom stacks.
-  # scope "/api", Capclearv1Web do
-  #   pipe_through :api
-  # end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:capclearv1, :dev_routes) do
